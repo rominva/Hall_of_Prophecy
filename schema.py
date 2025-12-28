@@ -21,16 +21,21 @@ with open("students.csv", "r") as file:
 
 # 2) Create empty Tables in SQL
 
-# 3) Insert data to empty tables
+# 3) Connect to database
 db = SQL("sqlite:///roster.db")  # For SQLite, file.db must exist
 
+# 4) Enable foreign key constraints
+db.execute("PRAGMA foreign_keys = ON")
+
+# 5) Insert data into houses table
 for house in houses:
-    # check for the existing data
+    # Check for existing data to avoid UNIQUE constraint errors
     rows = db.execute("SELECT id FROM houses WHERE house_name = ?", house)
     if len(rows) == 0:
         db.execute("INSERT INTO houses (house_name) VALUES(?)", house)
 
 
+# 6) Insert data into house_assignments table
 for head_name, house_name in heads:
     house_id = db.execute("SELECT id FROM houses WHERE house_name = ?", house_name)[0]["id"]
 
@@ -39,6 +44,8 @@ for head_name, house_name in heads:
     if len(rows) == 0:
         db.execute("INSERT INTO house_assignments (name, house_id) VALUES(?,?)", head_name, house_id)
 
+
+# 7) Insert data into students table
 for student in students:
     student_name = student["student_name"]
     student_house = student["house"]
@@ -51,3 +58,4 @@ for student in students:
         db.execute("INSERT INTO students (student_name, house_id) VALUES(?, ?)", student_name, house_id)
 
 
+print("Data has been inserted successfully!")

@@ -7,6 +7,11 @@ The goal of this exercise is to design and populate a relational database
 from a CSV file while enforcing proper **relational integrity**, **normalization**,
 and **foreign key constraints**.
 
+This repository provides **two approaches** to solve the problem:
+
+1. **Pure SQL** – using `schema.sql` to create tables, normalize data, and populate them.  
+2. **Python with CS50 SQL library** – using `schema.py` to read `students.csv` and populate `roster.db` with foreign keys.
+
 ---
 
 ## Problem Overview
@@ -49,18 +54,20 @@ Stores house heads.
 
 ## Data Import Strategy
 
-Because CSV files do not enforce data types or constraints, the import process
-is performed in two stages:
+### `1) Using SQL (`schema.sql`)`
+- A temporary table is used to import raw CSV data without constraints.  
+- Header row is removed manually.  
+- Data is normalized and inserted into the final tables with proper foreign keys.  
+- Indexes are created for foreign key columns for better performance.
 
-1. **Temporary table (`temp`)**
-   - Raw CSV data is imported without constraints
-   - Header row is removed explicitly
+### `2) Using Python (`schema.py`)`
+- The CSV is read with Python’s `csv.DictReader`.  
+- Sets and dictionaries are used to collect unique houses and heads.  
+- `CS50 SQL` library is used to insert data into `roster.db` while resolving foreign keys in memory.  
+- Foreign key constraints are enforced, and uniqueness checks prevent duplicates.
 
-2. **Final tables**
-   - Tables with proper primary keys and foreign keys are created
-   - Data is inserted using `JOIN`s to map textual house names to numeric IDs
+This approach shows how Python can simplify inserting many rows programmatically while maintaining database integrity.
 
-This approach ensures clean data and strict referential integrity.
 
 ---
 
@@ -94,10 +101,14 @@ Indexes are created on foreign key columns to improve query performance:
 
 - `schema.sql` – Database schema, data insertion, and indexing
 - `students.csv` – Source data provided by the problem set
+- `schema.py` – Python script using CS50 SQL to import CSV data
+- `roster.db` – SQLite database created by Python script or SQL script
 
 ---
 
 ## How to Run
+
+### SQL Approach
 
 ```bash
 sqlite3 prophecy.db < schema.sql
@@ -105,14 +116,22 @@ sqlite3 prophecy.db < schema.sql
 
 This will create the database, import the data, and enforce all constraints.
 
+### Python Approach
+
+```bash
+python schema.py
+```
+Both methods will create a fully normalized database with correct foreign key relationships.
+
 ---
 
 ## Notes
 
-- The temporary table is dropped after data insertion.
-- The database is fully normalized.
-- All foreign key relationships are validated.
+- The temporary table in the SQL approach is dropped after insertion.
 
+- Both methods ensure referential integrity and prevent duplicates.
+
+- The database is ready for querying and further analysis.
 ---
 
 ## Author
